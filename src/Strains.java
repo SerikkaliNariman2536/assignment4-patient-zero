@@ -32,8 +32,14 @@ public class Strains {
      * but not necessarily next to each other. This is the "Shared core" line.
      * Example: "ACGTT" and "AGTC": the longest is "AGT", length 3.
      */
-    public static int lcsLength(String a, String b) {
-        // TODO Mission 2
-        return -1;
+    public static int lcsLength(String a, String b) {int n = a.length(), m = b.length();
+        int[][] l = new int[n + 1][m + 1];
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (a.charAt(i - 1) == b.charAt(j - 1)) l[i][j] = l[i - 1][j - 1] + 1;
+                else l[i][j] = Math.max(l[i - 1][j], l[i][j - 1]);
+            }
+        }
+        return l[n][m];
     }
 }
