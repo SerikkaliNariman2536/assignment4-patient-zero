@@ -55,7 +55,38 @@ public class Marker {
      * Example: a = "ACGTAC", b = "TTACGT", k = 4: the words of a are ACGT, CGTA, GTAC; only ACGT is in b, so the answer is 1.
      */
     public static int sharedWords(String a, String b, int k) {
-        // TODO Mission 4
-        return -1;
+        int na = a.length(), nb = b.length();
+        if (k <= 0 || na < k || nb < k) return 0;
+        final long MOD = 1_000_000_007L, BASE = 131L;
+        long pow = 1;
+        for (int i = 1; i < k; i++) pow = pow * BASE % MOD;
+
+        HashMap<Long, List<Integer>> windowsOfB = new HashMap<>();
+        long h = 0;
+        for (int i = 0; i < k; i++) h = (h * BASE + b.charAt(i)) % MOD;
+        windowsOfB.computeIfAbsent(h, x -> new ArrayList<>()).add(0);
+        for (int i = k; i < nb; i++) {
+            h = ((h - b.charAt(i - k) * pow % MOD + MOD) % MOD * BASE + b.charAt(i)) % MOD;
+            windowsOfB.computeIfAbsent(h, x -> new ArrayList<>()).add(i - k + 1);
+        }
+
+        int count = 0;
+        h = 0;
+        for (int i = 0; i < k; i++) h = (h * BASE + a.charAt(i)) % MOD;
+        for (int i = 0; ; i++) {
+            List<Integer> cand = windowsOfB.get(h);
+            if (cand != null) {
+                for (int pos : cand) {
+                    boolean same = true;
+                    for (int t = 0; t < k; t++) {
+                        if (a.charAt(i + t) != b.charAt(pos + t)) { same = false; break; }
+                    }
+                    if (same) { count++; break; }
+                }
+            }
+            if (i + k >= na) break;
+            h = ((h - a.charAt(i) * pow % MOD + MOD) % MOD * BASE + a.charAt(i + k)) % MOD;
+        }
+        return count;
     }
 }
